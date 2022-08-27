@@ -5,19 +5,20 @@ import axios from "axios";
 import "../style/table.css";
 
 // interfaces
-import ColumnNames from "../interfaces/column-names-state.interface";
+
 import Table from "../interfaces/table.interface";
 import WarehouseTable from "../interfaces/warehouse-table.interface";
 import SuppliersTable from "../interfaces/supplier-table.interface";
 import UsersTable from "../interfaces/user-table.interface";
 import MaterialTable from "../interfaces/material-table.interface";
+import { TableData } from "@backend/types/table";
 
 function ItemTable({
   columnArr,
   tableArr,
   deleteLink,
 }: {
-  columnArr: ColumnNames[];
+  columnArr: TableData;
   tableArr:
     | Table[]
     | WarehouseTable[]
@@ -35,19 +36,20 @@ function ItemTable({
     setDeleteId(parseInt(id));
   };
 
-  // deleteId and deleteLink are passed as second argument, whenever changes occur to any of them, useEffect function is triggered
+  // deleteId and deleteLink are passed as second argument, whenever changes occur to any of them, callback function to useEffect is triggered
   useEffect(() => {
     if (deleteId) {
       axios.delete(`${deleteLink}${deleteId}`);
-      // console.log("lololol");
     }
   }, [deleteId, deleteLink]);
+
+  if (!columnArr) return <h1>Loading</h1>;
 
   return (
     <table className="table-auto w-full text-center">
       <thead>
         <tr>
-          {columnArr.map((val) => {
+          {columnArr.columns.map((val) => {
             return <th>{val.column_name.replace("_", " ")}</th>;
           })}
           {/* an empty th column for the cross (delete button) at the end of the row */}

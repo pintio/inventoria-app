@@ -10,8 +10,7 @@ import Form from "../components/Form";
 import PopUp from "../components/PopUp";
 
 // interfaces
-// import ColumnNames from "../interfaces/column-names-state.interface";
-// import { ColumnName } from "@backend/types/table";
+
 import { TableData } from "@backend/types/table";
 import InputValue from "../interfaces/input-value-object.interface";
 import Table from "../interfaces/table.interface";
@@ -25,6 +24,7 @@ const CategoryPage = function (): JSX.Element {
   useEffect(() => {
     axios.get("/api/categoriesdata").then((res) => {
       setColumnNames(res.data);
+      console.log(res.data, "category columns");
     });
 
     axios.get("/api/allcategories").then((res) => {
@@ -58,16 +58,16 @@ const CategoryPage = function (): JSX.Element {
           setFormInputValues={setFormInput}
           formInput={formInput}
           columnArr={columnNames as TableData}
-          action={`/api/add/category/${formInput.category_name}`}
+          action={`/api/category/${formInput.category_name}`}
           method="post"
         />
       </PopUp>
 
-      {/* <ItemTable
-        columnArr={columnNames}
+      <ItemTable
+        columnArr={columnNames as TableData}
         tableArr={tableData}
-        deleteLink={"/api/delete/category/"}
-      /> */}
+        deleteLink={"/api/category/"}
+      />
     </Layout>
   );
 };
