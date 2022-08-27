@@ -1,5 +1,4 @@
 import express, { NextFunction, query, Request, Response } from "express";
-import { VerifyErrors } from "jsonwebtoken";
 import { sql } from "slonik";
 import jwt from "jsonwebtoken";
 
@@ -15,8 +14,6 @@ const jwtSecret = process.env.TOKEN_SECRET as string;
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   const token: string = req.cookies.jwt;
-
-  console.log("lfklkhdslkfhdsBRUHH", token, jwtSecret);
 
   if (token && jwtSecret) {
     jwt.verify(token, jwtSecret, (err, decodedToken) => {
@@ -41,6 +38,7 @@ function checkCurrentUser(req: Request, res: Response, next: NextFunction) {
   if (token) {
     jwt.verify(token, jwtSecret, async (err, decodedToken) => {
       const userData = decodedToken as unknown as { uuid: string };
+
       if (err) {
         console.log(err, "jdhfkdsjhf");
         res.redirect("/login");
@@ -55,8 +53,6 @@ function checkCurrentUser(req: Request, res: Response, next: NextFunction) {
               const noice = { ...req.app.locals };
               noice.user = user.rows[0];
               req.app.locals = noice;
-              // console.log(req.app.locals);
-              // const lol = req.app.locals;
 
               next();
             } else {

@@ -27,8 +27,9 @@ const CategoryPage = function (): JSX.Element {
       setColumnNames(res.data);
     });
 
-    axios.get("api/allcategories").then((res) => {
+    axios.get("/api/allcategories").then((res) => {
       setTableData(res.data);
+      console.log(res.data, "alll table");
     });
   }, []);
 

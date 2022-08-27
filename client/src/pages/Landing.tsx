@@ -54,15 +54,14 @@ function LandingPage(): JSX.Element {
                 },
               }).then((res) => {
                 setStatusCode(res.status);
-                console.log(res.data.redirect, "redirect ehre");
                 if (
-                  res.status === 202 &&
+                  res.status === 200 &&
                   res.data.redirect === "/profile-setup"
                 ) {
                   window.location =
                     `/profile-setup/${res.data.email}/${res.data.uuid}` as string &
                       Location;
-                } else if (res.status === 200 && res.data.redirect === "/app") {
+                } else if (res.status === 202) {
                   window.location = "/app" as string & Location;
                 }
               });

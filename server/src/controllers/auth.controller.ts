@@ -71,8 +71,6 @@ async function loginData(req: Request, res: Response) {
     foreign_keys: users.foreignKeys as unknown as ForeignKey,
   };
 
-  console.log(tableData, "lololol");
-
   res.status(203).send(tableData);
 }
 
@@ -90,8 +88,6 @@ async function signUp(req: Request, res: Response) {
     fullname: string;
     position: string;
   } = req.body;
-
-  console.log(req.body, "odoaihfs");
 
   let user;
 
@@ -115,8 +111,6 @@ async function signUp(req: Request, res: Response) {
     });
 
     const passwordHash = await argon2.hash(password, { type: argon2i });
-
-    console.log(email_id, username, passwordHash, fullname, position, today);
 
     (await psqlDb).connect(async (connection) => {
       await connection.query(
@@ -166,7 +160,7 @@ async function signIn(req: Request, res: Response) {
       }
 
       if (argon2.verify(user.rows[0].password, password)) {
-        const token = jwt.sign(user.rows[0].unique_id, jwtSecret);
+        const token = jwt.sign({ uuid: user.rows[0].unique_id }, jwtSecret);
         res.cookie("jwt", token, {
           maxAge: 1000 * 60 * 60 * 24,
           httpOnly: true,
