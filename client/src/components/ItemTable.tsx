@@ -50,7 +50,8 @@ function ItemTable({
       <thead>
         <tr>
           {columnArr.columns.map((val) => {
-            return <th>{val.column_name.replace("_", " ")}</th>;
+            if (val.column_name === "workspace_id") return <></>;
+            else return <th>{val.column_name.replace("_", " ")}</th>;
           })}
           {/* an empty th column for the cross (delete button) at the end of the row */}
           {/* need an edit functionality as well, TODO */}
@@ -63,6 +64,12 @@ function ItemTable({
           // so we can use the individual items from the value objects without knowing the specific keys and put them to the table
           // TODO - implement a better method.
 
+          // @ts-ignore
+          if (value.workspace_id) {
+            // @ts-ignore
+            delete value["workspace_id"];
+            console.log(value);
+          }
           const val: string[] = Object.values(value);
           return (
             <tr className=" bg-slate-100 hover:bg-slate-200 transition-colors duration-300 ease-in-out">

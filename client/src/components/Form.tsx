@@ -31,6 +31,7 @@ function Form({
   setFormInputValues: (value: React.SetStateAction<InputValue>) => void;
   formInput: InputValue;
   // columnArr: ColumnNames[];
+
   columnArr: TableData;
   action?: string;
   method?: string;
@@ -61,9 +62,10 @@ function Form({
     // since making changes to the original object (formInput state) do not re-render the component (react uses object.is() to compare objects) making a copy of the fromInput input and then making changes to the copied object.
     const newFormInput = { ...formInput };
     newFormInput[formIn.label] = formIn.value;
+
     setFormInputValues(newFormInput);
-    console.log(formInput, "ff");
-    console.log(columnArr, "lololol");
+    // console.log(formInput, "ff");
+    // console.log(columnArr, "lololol");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formIn]);
 
@@ -86,6 +88,7 @@ function Form({
       )}
 
       <form
+        name="post"
         className="px-16 py-8"
         action={action}
         method={method}
@@ -115,27 +118,6 @@ function Form({
               <InputElement columnData={val} inputHandler={inputHandler} />
             );
           }
-          // return (
-          //   <InputElement columnData={val} inputHandler={inputHandler} />
-          // <label
-          //   key={val.column_name}
-          //   className={`${
-          //     val.column_name === "serial_number"
-          //       ? " hidden"
-          //       : val.column_name === "joining_date"
-          //       ? " hidden"
-          //       : ""
-          //   }`}
-          // >
-          //   {val.column_name.replace("_", " ")}
-          //   <input
-          //     className={formInputClass}
-          //     type={val.data_type}
-          //     name={val.column_name}
-          //     onChange={inputHandler}
-          //   />
-          // </label>
-          // );
         })}
 
         <button>
@@ -166,7 +148,8 @@ function InputElement({
     colName === "id" ||
     colName === "last_update" ||
     colName === "unique_id" ||
-    colName === "joining_date"
+    colName === "joining_date" ||
+    colName === "workspace_id"
   ) {
     labelClass = "hidden";
   }
@@ -201,17 +184,31 @@ function SelectElement({
 
   const [foreignTableData, setForeignTableData] = useState<QueryResult>();
 
+  let labelClass: string = "w-full text-white";
+
   useEffect(() => {
     axios.get(`/api/all${tableName}`).then((res) => {
       setForeignTableData(res.data);
       console.log("noice11", tableName, res.data);
     });
+
+    // workspace_id is set on the server side.
+    // so, hidding it in the client side
   }, [tableName]);
 
+  if (
+    // columnData.column_name === "id" ||
+    // columnData.column_name === "last_update" ||
+    // columnData.column_name === "unique_id" ||
+    // columnData.column_name === "joining_date" ||
+    columnData.column_name === "workspace_id"
+  ) {
+    labelClass = "hidden";
+  }
+
   if (foreignTableData && foreignTableData.rowCount > 0) {
-    console.log("herrerererererere", foreignTableData, tableName);
     return (
-      <label className=" w-full  text-white">
+      <label className={labelClass}>
         {columnData.column_name}
         <select
           onChange={inputHandler}

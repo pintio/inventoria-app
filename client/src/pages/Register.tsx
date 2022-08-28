@@ -51,10 +51,8 @@ function RegisterPage(): JSX.Element {
                 data: formInputValues,
               }).then((res) => {
                 setStatusCode(res.status);
-                if (res.status === 200) {
-                  window.location =
-                    `/profile-setup/${res.data.email}/${res.data.uuid}` as string &
-                      Location;
+                if (res.status === 201) {
+                  window.location = `/login` as string & Location;
                 }
               });
             }}
@@ -63,7 +61,7 @@ function RegisterPage(): JSX.Element {
         <div>
           {isNaN(statusCode) ? (
             <></>
-          ) : statusCode === 200 ? (
+          ) : statusCode === 201 ? (
             <h2 className=" text-md font-semibold text-green-600">
               Signedup : successful
             </h2>

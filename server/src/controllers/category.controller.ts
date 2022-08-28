@@ -75,8 +75,10 @@ async function postCategory(
 ) {
   try {
     (await psqlDb).connect(async (connection) => {
+      const workspace_id = req.app.locals.user.workspace_id;
+
       await connection.query(
-        sql`INSERT INTO categories(category_name) VALUES(${req.params.name})`
+        sql`INSERT INTO categories(category_name, workspace_id) VALUES(${req.params.name}, ${workspace_id})`
       );
     });
 

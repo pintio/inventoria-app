@@ -47,7 +47,7 @@ function checkCurrentUser(req: Request, res: Response, next: NextFunction) {
           (await psqlDb).connect(async (connection) => {
             // console.log("before checking user  noice");
             const user = await connection.query(
-              sql`SELECT fullname, position, joining_date, email_id FROM users WHERE unique_id=${userData.uuid};`
+              sql`SELECT fullname, position, joining_date, email_id, workspace_id FROM users WHERE unique_id=${userData.uuid};`
             );
             if (user) {
               const noice = { ...req.app.locals };

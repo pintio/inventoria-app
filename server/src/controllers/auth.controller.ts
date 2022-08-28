@@ -77,13 +77,11 @@ async function loginData(req: Request, res: Response) {
 async function signUp(req: Request, res: Response) {
   const {
     email_id,
-    username,
     password,
     fullname,
     position,
   }: {
     email_id: string;
-    username: string;
     password: string;
     fullname: string;
     position: string;
@@ -114,7 +112,7 @@ async function signUp(req: Request, res: Response) {
 
     (await psqlDb).connect(async (connection) => {
       await connection.query(
-        sql`INSERT INTO users(email_id,username,password,fullname,position,joining_date) VALUES(${email_id},${username},${passwordHash},${fullname},${position},${today})`
+        sql`INSERT INTO users(email_id,password,fullname,position,joining_date) VALUES(${email_id},${passwordHash},${fullname},${position},${today})`
       );
 
       // 201 -> created
