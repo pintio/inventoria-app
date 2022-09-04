@@ -14,8 +14,7 @@ import { users } from "../api/dbschema";
 
 // argon2
 import { argon2i } from "argon2";
-import { Connection } from "pg";
-const argon2 = require("argon2");
+import * as argon2 from "argon2";
 
 // jwt for token generation
 const jwt = require("jsonwebtoken");
@@ -142,54 +141,62 @@ async function signIn(req: Request, res: Response) {
     const { email_id, password }: { email_id: string; password: string } =
       req.body;
 
+    // checking if a user exists with the email id.
     (await psqlDb).connect(async (connection) => {
       const data = await connection.query(
         sql`SELECT * FROM users WHERE email_id=${email_id}`
       );
       user = data;
 
+      // if the db does not return any user, or there is something wrong with the result, the beloe code is excecuted.
       if (!user) {
         res.status(404).send("incorrect email id");
         throw Error("incorrect email id");
       }
+      // if the result contain some data.
+      // but the resulted object does not contain any row, ie, there is no user matching the email id provided by the user.
+      // an error message with 404 is sent as the response that the user does not exist
       if ((user.rowCount as number) < 1) {
         res.status(404).send("user does not exist");
         return;
       }
 
-      if (argon2.verify(user.rows[0].password, password)) {
+      // checking if the password submitted by the user is same as the one stored in the db.
+      // password is verified against the hash stored in the db by using the verify function provided by the argon2 library
+      if (await argon2.verify(user.rows[0].password as string, password)) {
+        // generating the jwt for signed in user.
+        // uuid of the user is taken from the db.
+        // then, the encoded jwt is generated.
         const token = jwt.sign({ uuid: user.rows[0].unique_id }, jwtSecret);
+
+        // setting the generated jwt (encoded uuid of the user) to the cookies. this token is used to verify any user is logged in or not.
+        // max age is 24 hrs
+        // httpOnly, secures the cookie by not exposing it to the client
         res.cookie("jwt", token, {
           maxAge: 1000 * 60 * 60 * 24,
           httpOnly: true,
         });
         res.status(202).send("successfully logged in");
       } else {
+        // if the varification returns false, ie, entered password is wrong
         res.status(404).send("wrong password");
       }
     });
-
-    // else {
-    //   const { isCompleted, error } = await isProfileComplete(user, res);
-    //   console.log(isCompleted, error, "lol");
-    //   if (error) {
-    //     console.log(error, "failed");
-    //     return;
-    //   }
-    //   if (!isCompleted) {
-    //     res.json({
-    //       email: user?.email,
-    //       uuid: user?.id,
-    //       redirect: "/profile-setup",
-    //     });
-    //     // console.log(psqlDb.auth.user());
-    //     res.status(200);
-    //   } else {
-    //     res.json({ redirect: "/app" });
-    //     res.status(200);
-    //   }
-    // }
   } catch (error) {}
+}
+
+function signOut(req: Request, res: Response) {
+  if (req.cookies.jwt) {
+    // removing jwt cookie
+    res.clearCookie("jwt");
+
+    // removing current user from the app.local object, which was set using the auth middleware
+    req.app.locals.user = "";
+
+    res.send(205);
+  }
+
+  res.end();
 }
 
 async function getUsers(req: Request, res: Response) {
@@ -203,4 +210,4 @@ async function getUsers(req: Request, res: Response) {
   } catch (error) {}
 }
 
-export { signUp, signIn, authData, getUsers, loginData };
+export { signUp, signIn, signOut, authData, getUsers, loginData };

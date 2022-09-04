@@ -50,9 +50,12 @@ function checkCurrentUser(req: Request, res: Response, next: NextFunction) {
               sql`SELECT fullname, position, joining_date, email_id, workspace_id FROM users WHERE unique_id=${userData.uuid};`
             );
             if (user) {
-              const noice = { ...req.app.locals };
-              noice.user = user.rows[0];
-              req.app.locals = noice;
+              // storing the current user data in the app.locals object which is accessable every routes inside the express 'app'.
+              const currentUser = user.rows[0];
+              req.app.locals.user = currentUser;
+              // const noice = { ...req.app.locals };
+              // noice.user = user.rows[0];
+              // req.app.locals = noice;
 
               next();
             } else {

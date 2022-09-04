@@ -22,9 +22,19 @@ function Header({ className }: { className?: string }): JSX.Element {
 
       <div
         onClick={() => {
-          axios.get("/api/auth/logout").then((res) => {
-            console.log(res);
-          });
+          axios("/auth/logout", {
+            method: "get",
+          })
+            .then((res) => {
+              if (res.status === 205) {
+                window.location = "/" as string & Location;
+              } else {
+                alert("something went wrong, please try again.");
+              }
+            })
+            .catch(() => {
+              console.log("noice");
+            });
         }}
       >
         <UserIcon />

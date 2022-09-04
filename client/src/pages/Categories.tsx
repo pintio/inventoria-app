@@ -22,15 +22,21 @@ const CategoryPage = function (): JSX.Element {
   const [tableData, setTableData] = useState<Table[]>([]);
 
   useEffect(() => {
-    axios.get("/api/categoriesdata").then((res) => {
-      setColumnNames(res.data);
-      console.log(res.data, "category columns");
-    });
+    axios
+      .get("/api/categoriesdata")
+      .then((res) => {
+        setColumnNames(res.data);
+        console.log(res.data, "category columns");
+      })
+      .catch(() => (window.location = "/" as string & Location));
 
-    axios.get("/api/allcategories").then((res) => {
-      setTableData(res.data);
-      console.log(res.data, "alll table");
-    });
+    axios
+      .get("/api/allcategories")
+      .then((res) => {
+        setTableData(res.data);
+        console.log(res.data, "alll table");
+      })
+      .catch(() => (window.location = "/" as string & Location));
   }, []);
 
   return (

@@ -4,6 +4,8 @@ import { sql, ValueExpression } from "slonik";
 // database pool
 import psqlDb from "../db";
 
+import { setWorkspaceSessionVariable } from "../utils/setSessionVariable";
+
 // column names
 import { categories } from "../api/dbschema";
 import { ColumnName, ForeignKey, TableData } from "../api/types/table";
@@ -12,6 +14,12 @@ import { ColumnName, ForeignKey, TableData } from "../api/types/table";
 async function categoriesData(req: Request, res: Response) {
   try {
     (await psqlDb).connect(async (connection) => {
+      // setting session variable on the db server for the current connection to let the db know the workspace id for the current user, which is then used to get the values from the tables which are RLS protected
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const columnData = await connection.query(
         sql<queries.Column>`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'categories';`
       );
@@ -34,6 +42,11 @@ async function categoriesData(req: Request, res: Response) {
 async function getCategoryById(req: Request<{ id: number }>, res: Response) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const data = await connection.query(
         sql`SELECT * FROM catagories WHERE ID = ${req.params.id}`
       );
@@ -54,6 +67,11 @@ async function getCategoryById(req: Request<{ id: number }>, res: Response) {
 async function getAllCategories(req: Request, res: Response) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const categories = await connection.query(
         sql<queries.Category>`SELECT * FROM categories`
       );
@@ -75,6 +93,11 @@ async function postCategory(
 ) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const workspace_id = req.app.locals.user.workspace_id;
 
       await connection.query(
@@ -96,6 +119,10 @@ async function deleteCategory(
 ) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
       await connection.query(
         sql`DELETE FROM categories WHERE id = ${req.params.id}`
       );

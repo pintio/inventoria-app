@@ -7,11 +7,18 @@ import psqlDb from "../db";
 import { warehouses } from "../api/dbschema";
 import { sql, ValueExpression } from "slonik";
 import { ColumnName, ForeignKey, TableData } from "../api/types/table";
+import { setWorkspaceSessionVariable } from "../utils/setSessionVariable";
 
 async function getWarehouseData(req: Request, res: Response) {
   try {
     // const { data, error } = await psqlDb.from("categories").select("*");
     (await psqlDb).connect(async (connection) => {
+      // setting session variable on the db server for the current connection to let the db know the workspace id for the current user, which is then used to get the values from the tables which are RLS protected
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const columnData = await connection.query(
         sql<queries.Column>`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'warehouses';`
       );
@@ -31,6 +38,11 @@ async function getWarehouseData(req: Request, res: Response) {
 async function getAllWarehouse(req: Request, res: Response) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const data = await connection.query(
         sql<queries.Warehouse>`SELECT * FROM warehouses`
       );
@@ -47,6 +59,11 @@ async function getAllWarehouse(req: Request, res: Response) {
 async function getWarehouseById(req: Request<{ id: number }>, res: Response) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const data = await connection.query(
         sql<queries.Warehouse>`SELECT * FROM warehouses WHERE ID = ${req.params.id}`
       );
@@ -66,6 +83,11 @@ async function postWarehouse(
 ) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       const workspace_id = req.app.locals.user.workspace_id;
       await connection.query(
         sql`INSERT INTO warehouses(warehouse_name, workspace_id) VALUES(${req.params.name}, ${workspace_id})`
@@ -84,6 +106,11 @@ async function deleteWarehouse(
 ) {
   try {
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+
       await connection.query(
         sql`DELETE FROM warehouses WHERE id = ${req.params.id}`
       );

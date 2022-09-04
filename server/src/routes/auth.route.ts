@@ -8,6 +8,7 @@ import {
   authData,
   getUsers,
   loginData,
+  signOut,
 } from "../controllers/auth.controller";
 
 router.get("/authdata", authData);
@@ -17,6 +18,8 @@ router.get("/logindata", loginData);
 router.get("/users", getUsers);
 
 router.post("/signup", signUp);
+
+router.get("/logout", signOut);
 
 router.post("/signin", signIn);
 

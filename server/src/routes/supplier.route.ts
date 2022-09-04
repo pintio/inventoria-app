@@ -3,6 +3,7 @@ import express, { Request } from "express";
 import {
   deleteSupplier,
   getAllSuppliers,
+  getSupplierById,
   getSuppliersData,
   postSupplier,
 } from "../controllers/supplier.controller";
@@ -14,21 +15,8 @@ router.get("/suppliersdata", getSuppliersData);
 
 router.get("/allsuppliers", getAllSuppliers);
 
-// // to get only one category matching the id
-// router.get(
-//   "/api/get/supplier/:id",
-//   async (req: Request<{ id: number }>, res) => {
-//     try {
-//       const { data, error } = await psqlDb
-//         .from("suppliers")
-//         .select("*")
-//         .match({ s_id: req.params.id });
-//       res.send(data);
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   }
-// );
+// to get only one category matching the id
+router.get("/api/get/supplier/:id", getSupplierById);
 
 router.post("/supplier/:name", postSupplier);
 
