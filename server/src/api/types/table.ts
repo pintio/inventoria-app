@@ -39,3 +39,25 @@ export interface Error {
   errorMessage: string;
   table: string;
 }
+
+export interface Category {
+  /** regtype: `integer` */
+  id: number | null;
+
+  /** regtype: `text` */
+  category_name: string | null;
+
+  /** regtype: `uuid` */
+  workspace_id: string | null;
+}
+
+export interface Supplier {
+  /** regtype: `integer` */
+  id: number | null;
+
+  /** regtype: `text` */
+  supplier_name: string | null;
+
+  /** regtype: `uuid` */
+  workspace_id: string | null;
+}

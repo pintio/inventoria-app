@@ -23,7 +23,10 @@ const StockPage = function (): JSX.Element {
   useEffect(() => {
     axios.get("/api/materialdata").then((res) => {
       setColumnNames(res.data);
-      console.log(res.data, "success");
+    });
+
+    axios.get("/api/materialdata").then((res) => {
+      setTableData(res.data);
     });
 
     // axios.get("api/get/allMaterials").then(async (res) => {
@@ -138,6 +141,8 @@ const StockPage = function (): JSX.Element {
           setFormInputValues={setFormInput}
           formInput={formInput}
           columnArr={columnNames as unknown as TableData}
+          action="/api/material"
+          method="POST"
         />
       </PopUp>
 

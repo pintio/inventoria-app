@@ -12,6 +12,8 @@ import SuppliersTable from "../interfaces/supplier-table.interface";
 import UsersTable from "../interfaces/user-table.interface";
 import MaterialTable from "../interfaces/material-table.interface";
 import { TableData } from "@backend/types/table";
+import { Supplier } from "@backend/types/table";
+import { tab } from "@testing-library/user-event/dist/tab";
 
 function ItemTable({
   columnArr,
@@ -22,7 +24,7 @@ function ItemTable({
   tableArr:
     | Table[]
     | WarehouseTable[]
-    | SuppliersTable[]
+    | Supplier[]
     | UsersTable[]
     | MaterialTable[];
   deleteLink: string;
@@ -43,56 +45,78 @@ function ItemTable({
     }
   }, [deleteId, deleteLink]);
 
-  if (!columnArr) return <h1>Loading</h1>;
-
   return (
     <table className="table-auto w-full text-center">
-      <thead>
-        <tr>
-          {columnArr.columns.map((val) => {
-            if (val.column_name === "workspace_id") return <></>;
-            else return <th>{val.column_name.replace("_", " ")}</th>;
-          })}
-          {/* an empty th column for the cross (delete button) at the end of the row */}
-          {/* need an edit functionality as well, TODO */}
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {tableArr.map((value, index) => {
-          // getting an array of values from the value object.
-          // so we can use the individual items from the value objects without knowing the specific keys and put them to the table
-          // TODO - implement a better method.
-
-          // @ts-ignore
-          if (value.workspace_id) {
-            // @ts-ignore
-            delete value["workspace_id"];
-            console.log(value);
-          }
-          const val: string[] = Object.values(value);
-          return (
-            <tr className=" bg-slate-100 hover:bg-slate-200 transition-colors duration-300 ease-in-out">
-              {/* maping over the array of values of the value object */}
-              {/* TODO - improve naming  */}
-              {/* i===0, first element of the array (first column of a row), if true, display the serial number (not the actual one from the database, but only the index to imrove readability and not confusing the users)*/}
-              {/* every other column displays its original value, i.e. v */}
-              {val.map((v, i) => {
-                return <td>{i === 0 ? index + 1 : v}</td>;
-              })}
-              {/* delete button, at the end of each row. handles the delete functionality, the api/link to delete the row, i.e. the data differs for each table, is passed from the parent component */}
-              {/* data-id holds the unique id from the database, used in the handleDelete function */}
-              <td className="bold text-slate-800 text-xl hover:cursor-pointer hover:bg-red-600 hover:text-slate-100 transition-colors duration-300 ease-in-out">
-                <button data-id={val[0].toString()} onClick={handleDelete}>
-                  X
-                </button>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
+      {!columnArr ? (
+        <p>loading</p>
+      ) : (
+        <thead>
+          <tr>
+            {columnArr.columns.map((val) => {
+              if (val.column_name === "workspace_id") return <></>;
+              else return <th>{val.column_name.replace("_", " ")}</th>;
+            })}
+            {/* an empty th column for the cross (delete button) at the end of the row */}
+            {/* need an edit functionality as well, TODO */}
+            <th></th>
+          </tr>
+        </thead>
+      )}
+      <TableBody tableArr={tableArr} handleDelete={handleDelete} />
     </table>
   );
 }
+
+const TableBody = ({
+  tableArr,
+  handleDelete,
+}: {
+  tableArr:
+    | Table[]
+    | WarehouseTable[]
+    | Supplier[]
+    | UsersTable[]
+    | MaterialTable[];
+  handleDelete: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) => {
+  if (tableArr.length === 0)
+    return <h1>No data available, kindly add some.</h1>;
+
+  return (
+    <tbody>
+      {tableArr.map((value, index) => {
+        // getting an array of values from the value object.
+        // so we can use the individual items from the value objects without knowing the specific keys and put them to the table
+        // TODO - implement a better method.
+
+        // @ts-ignore
+        if (value.workspace_id) {
+          // @ts-ignore
+          delete value["workspace_id"];
+          console.log(value);
+        }
+        const val: string[] = Object.values(value);
+        return (
+          <tr className=" bg-slate-100 hover:bg-slate-200 transition-colors duration-300 ease-in-out">
+            {/* maping over the array of values of the value object */}
+            {/* TODO - improve naming  */}
+            {/* i===0, first element of the array (first column of a row), if true, display the serial number (not the actual one from the database, but only the index to imrove readability and not confusing the users)*/}
+            {/* every other column displays its original value, i.e. v */}
+            {val.map((v, i) => {
+              return <td>{i === 0 ? index + 1 : v}</td>;
+            })}
+            {/* delete button, at the end of each row. handles the delete functionality, the api/link to delete the row, i.e. the data differs for each table, is passed from the parent component */}
+            {/* data-id holds the unique id from the database, used in the handleDelete function */}
+            <td className="bold text-slate-800 text-xl hover:cursor-pointer hover:bg-red-600 hover:text-slate-100 transition-colors duration-300 ease-in-out">
+              <button data-id={val[0].toString()} onClick={handleDelete}>
+                X
+              </button>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  );
+};
 
 export default ItemTable;

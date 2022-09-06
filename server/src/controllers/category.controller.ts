@@ -75,7 +75,7 @@ async function getAllCategories(req: Request, res: Response) {
       const categories = await connection.query(
         sql<queries.Category>`SELECT * FROM categories`
       );
-      res.status(203).send(categories.rows);
+      res.status(203).send(categories);
     });
   } catch (e) {
     res.status(404).send(e);
@@ -148,19 +148,22 @@ export declare namespace queries {
 
   /** - query: `SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'categories';` */
   export interface Column {
-    /** column: `information_schema.columns.column_name`, regtype: `name` */
+    /** regtype: `name` */
     column_name: string | null;
 
-    /** column: `information_schema.columns.data_type`, regtype: `character varying` */
+    /** regtype: `character varying` */
     data_type: string | null;
   }
 
   /** - query: `SELECT * FROM categories` */
   export interface Category {
-    /** column: `public.categories.id`, not null: `true`, regtype: `integer` */
-    id: number;
+    /** regtype: `integer` */
+    id: number | null;
 
-    /** column: `public.categories.category_name`, regtype: `text` */
+    /** regtype: `text` */
     category_name: string | null;
+
+    /** regtype: `uuid` */
+    workspace_id: string | null;
   }
 }

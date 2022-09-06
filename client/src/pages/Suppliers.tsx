@@ -10,16 +10,16 @@ import Form from "../components/Form";
 import PopUp from "../components/PopUp";
 
 // interfaces
-import ColumnNames from "../interfaces/column-names-state.interface";
 import InputValue from "../interfaces/input-value-object.interface";
-import SuppliersTable from "../interfaces/supplier-table.interface";
 import { TableData } from "@backend/types/table";
+import Table from "src/interfaces/table.interface";
+import { Supplier } from "@backend/types/table";
 
 const SuppliersPage = function (): JSX.Element {
   const [formVisibility, setFormVisibility] = useState<boolean>(false);
   const [formInput, setFormInput] = useState<InputValue>({});
   const [columnNames, setColumnNames] = useState<TableData>();
-  const [tableData, setTableData] = useState<SuppliersTable[]>([]);
+  const [tableData, setTableData] = useState<Supplier[]>([]);
 
   useEffect(() => {
     axios.get("/api/suppliersdata").then((res) => {
@@ -27,10 +27,11 @@ const SuppliersPage = function (): JSX.Element {
     });
 
     axios.get("/api/allsuppliers").then((res) => {
-      setTableData(res.data);
+      setTableData(res.data.rows);
     });
-    console.log(formInput);
   }, [formInput, formVisibility]);
+
+  // if (!columnNames && !tableData) return <>loading</>;
 
   return (
     <Layout>
@@ -57,16 +58,16 @@ const SuppliersPage = function (): JSX.Element {
           setFormInputValues={setFormInput}
           formInput={formInput}
           columnArr={columnNames as TableData}
-          action={`/api/add/supplier/${formInput.supplier_name}`}
+          action={`/api/supplier/${formInput.supplier_name}`}
           method="post"
         />
       </PopUp>
 
-      {/* <ItemTable
-        columnArr={columnNames}
+      <ItemTable
+        columnArr={columnNames as TableData}
         tableArr={tableData}
-        deleteLink={"/api/delete/supplier/"}
-      /> */}
+        deleteLink={"/api/supplier/"}
+      />
     </Layout>
   );
 };

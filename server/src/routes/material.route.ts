@@ -6,6 +6,9 @@ import { materials } from "../api/dbschema";
 
 // interfaces
 import { TableData, ColumnName, ForeignKey } from "../api/types/table";
+import { getCurrentDate } from "../utils/date";
+import { Console } from "console";
+import { setWorkspaceSessionVariable } from "../utils/setSessionVariable";
 
 const router = express.Router();
 
@@ -25,7 +28,12 @@ const router = express.Router();
 router.get("/materialdata", async (req, res) => {
   try {
     // const { data, error } = await psqlDb.from("categories").select("*");
+
     (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
       const columnData = await connection.query(
         sql<queries.Column>`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'materials';`
       );
@@ -43,52 +51,61 @@ router.get("/materialdata", async (req, res) => {
   }
 });
 
-// router.get("/api/get/allMaterials", async (req, res) => {
-//   try {
-//     const { data, error } = await psqlDb.from("materials").select("*");
-//     if (error) {
-//       console.log(error, "stock route");
-//       return;
-//     }
-//     res.send(data);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
+router.get("/api/get/allMaterials", async (req, res) => {
+  try {
+    (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
 
-// router.post(
-//   "/api/add/material/:materialname&:categoryid&:warehouseid&:supplierid&:receivedby",
-//   async (
-//     req: Request<{
-//       materialname: string;
-//       categoryid: number;
-//       warehouseid: number;
-//       supplierid: number;
-//       receivedby: number;
-//     }>,
-//     res
-//   ) => {
-//     try {
-//       const date = new Date();
-//       const today = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-//       const { data, error } = await psqlDb.from("materials").insert({
-//         material_name: req.params.materialname,
-//         last_update: today,
-//         category_id: req.params.categoryid,
-//         warehouse_id: req.params.warehouseid,
-//         supplier_id: req.params.supplierid,
-//         received_by: req.params.receivedby,
-//       });
-//       if (error) {
-//         console.log(error);
-//         return;
-//       }
-//       res.status(204).send();
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   }
-// );
+      const data = await connection.query(sql`SELECT * FROM materials`);
+
+      if (data) res.status(203).send(data);
+      else res.sendStatus(404);
+    });
+  } catch (e) {
+    res.status(404).send(e);
+    console.log(e);
+  }
+});
+
+router.post("/material", async (req, res) => {
+  try {
+    const today: string = getCurrentDate();
+
+    const workspace_id = req.app.locals.user.workspace_id;
+
+    console.log(req.body, "noice");
+
+    const {
+      supplier,
+      id,
+      last_update,
+      quantity,
+      price,
+      minimum_quantity,
+      material_name,
+      suppliers,
+      warehouses,
+      categories,
+    } = req.body;
+
+    (await psqlDb).connect(async (connection) => {
+      await setWorkspaceSessionVariable(
+        connection,
+        req.app.locals.user.workspace_id
+      );
+      await connection.query(
+        sql`INSERT INTO materials(material_name, last_update, quantity, price, minimum_quantity, workspace_id, warehouse_id, category_id, supplier_id) VALUES(${material_name}, ${today}, ${quantity}, ${price}, ${minimum_quantity}, ${workspace_id}, ${warehouses}, ${categories}, ${suppliers})`
+      );
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 // router.delete(
 //   "/api/delete/material/:materialid",
@@ -175,10 +192,10 @@ export declare namespace queries {
 
   /** - query: `SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'materials';` */
   export interface Column {
-    /** column: `information_schema.columns.column_name`, regtype: `name` */
+    /** regtype: `name` */
     column_name: string | null;
 
-    /** column: `information_schema.columns.data_type`, regtype: `character varying` */
+    /** regtype: `character varying` */
     data_type: string | null;
   }
 }

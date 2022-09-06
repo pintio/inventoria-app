@@ -33,11 +33,13 @@ const CategoryPage = function (): JSX.Element {
     axios
       .get("/api/allcategories")
       .then((res) => {
-        setTableData(res.data);
+        setTableData(res.data.rows);
         console.log(res.data, "alll table");
       })
       .catch(() => (window.location = "/" as string & Location));
   }, []);
+
+  if (!columnNames && !tableData) return <>loading</>;
 
   return (
     <Layout>

@@ -105,6 +105,7 @@ function Form({
         {columnArr.columns.map((val, index) => {
           // checking if the column is foriegn key or not by checking whether the column name exists in the foreign key object consisting of all the foreign keys in the table.
           // if it is a foreign key,
+
           if (columnArr.foreign_keys[val.column_name]) {
             return (
               <SelectElement
@@ -189,7 +190,6 @@ function SelectElement({
   useEffect(() => {
     axios.get(`/api/all${tableName}`).then((res) => {
       setForeignTableData(res.data);
-      console.log("noice11", tableName, res.data);
     });
 
     // workspace_id is set on the server side.

@@ -28,9 +28,11 @@ const WarehousesPage = function (): JSX.Element {
     });
 
     axios.get("/api/allwarehouses").then((res) => {
-      setTableData(res.data);
+      setTableData(res.data.rows);
     });
   }, []);
+
+  if (!columnNames && !tableData) return <p>Loading....</p>;
 
   return (
     <Layout>
@@ -57,16 +59,16 @@ const WarehousesPage = function (): JSX.Element {
           setFormInputValues={setFormInput}
           formInput={formInput}
           columnArr={columnNames as TableData}
-          action={`/api/add/warehouse/${formInput.warehouse_name}`}
+          action={`/api/warehouse/${formInput.warehouse_name}`}
           method="post"
         />
       </PopUp>
 
-      {/* <ItemTable
-        columnArr={columnNames}
+      <ItemTable
+        columnArr={columnNames as TableData}
         tableArr={tableData}
-        deleteLink={"/api/delete/warehouse/"}
-      /> */}
+        deleteLink={"/api/warehouse/"}
+      />
     </Layout>
   );
 };
