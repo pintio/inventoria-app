@@ -13,6 +13,7 @@ import PopUp from "../components/PopUp";
 import InputValue from "../interfaces/input-value-object.interface";
 import MaterialTable from "../interfaces/material-table.interface";
 import { TableData } from "@backend/types/table";
+import Table from "src/interfaces/table.interface";
 
 const StockPage = function (): JSX.Element {
   const [formVisibility, setFormVisibility] = useState<boolean>(false);
@@ -25,8 +26,17 @@ const StockPage = function (): JSX.Element {
       setColumnNames(res.data);
     });
 
-    axios.get("/api/materialdata").then((res) => {
-      setTableData(res.data);
+    axios.get("/api/allmaterials").then((res) => {
+      console.log(res.data, "noice");
+
+      let lol = res.data.rows;
+
+      // get individual rows for each foreign key id
+
+      // res.data.rows.forEach((row)=>{
+      //   const category = await axios.get()
+      // })
+      setTableData(res.data.rows);
     });
 
     // axios.get("api/get/allMaterials").then(async (res) => {
@@ -113,7 +123,7 @@ const StockPage = function (): JSX.Element {
     // console.log(formInput, "input from form fields");
   }, []);
 
-  if (!columnNames) return <h1>lolololol</h1>;
+  if (!columnNames && !tableData) return <h1>lolololol</h1>;
 
   return (
     <Layout>
@@ -135,7 +145,6 @@ const StockPage = function (): JSX.Element {
       </div>
 
       <PopUp visibility={formVisibility}>
-        {/* TODO impl. onsubmit function */}
         <Form
           setVisibility={setFormVisibility}
           setFormInputValues={setFormInput}
@@ -147,7 +156,7 @@ const StockPage = function (): JSX.Element {
       </PopUp>
 
       <ItemTable
-        columnArr={columnNames}
+        columnArr={columnNames as TableData}
         tableArr={tableData}
         deleteLink={"/api/delete/material/"}
       />

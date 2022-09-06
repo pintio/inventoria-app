@@ -29,6 +29,7 @@ function ItemTable({
     | MaterialTable[];
   deleteLink: string;
 }) {
+  console.log(tableArr, "herrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeee");
   const [deleteId, setDeleteId] = useState<number>(NaN);
 
   // handler function, cahnges deleteId state, which then triggers the excecution of the useEffect function and component to rerender.
@@ -79,7 +80,7 @@ const TableBody = ({
     | MaterialTable[];
   handleDelete: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }) => {
-  if (tableArr.length === 0)
+  if (tableArr.length === 0 || typeof tableArr === "undefined")
     return <h1>No data available, kindly add some.</h1>;
 
   return (

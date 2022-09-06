@@ -51,7 +51,7 @@ router.get("/materialdata", async (req, res) => {
   }
 });
 
-router.get("/api/get/allMaterials", async (req, res) => {
+router.get("/allmaterials", async (req, res) => {
   try {
     (await psqlDb).connect(async (connection) => {
       await setWorkspaceSessionVariable(
@@ -60,6 +60,7 @@ router.get("/api/get/allMaterials", async (req, res) => {
       );
 
       const data = await connection.query(sql`SELECT * FROM materials`);
+      console.log(data, "data");
 
       if (data) res.status(203).send(data);
       else res.sendStatus(404);
